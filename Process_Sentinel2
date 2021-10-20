@@ -1,0 +1,89 @@
+
+// CODI PER A LA VISUALITZACIÓ I SEL·LECCIÓ DE LES IMATGES
+//definim regió d'interès
+var Delta = ee.Geometry.Rectangle([0.565066015548572,40.604362720607654,0.883669531173572,40.80009008801863]);
+
+// Define the visualization parameters.
+var vizParams = {
+  bands: ['B8', 'B4', 'B3'],
+  min: 294.1,
+  max: 2222.9,
+};
+
+
+//visualitzem la quantitat d'informació
+var collection = ee.ImageCollection('COPERNICUS/S2_SR')
+  .filterDate('2021-09-25','2021-09-30')
+  .filterBounds(Delta);
+
+print(collection)
+
+//Sample function to clip imagecollections
+collection = collection.map(function(img){return img.clip(Delta)});
+
+Map.centerObject(Delta)
+Map.addLayer(collection, vizParams, 'Collection');
+//Map.addLayer(Delta)
+
+
+
+////CODI PER A LA DESCÀRREGA DE LES IMATGES SELECCIONADES
+//definim regió d'interès
+var Delta = ee.Geometry.Rectangle([0.565066015548572,40.604362720607654,0.883669531173572,40.80009008801863]);
+
+// Define the visualization parameters.
+var vizParams = {
+  bands: ['B8', 'B4', 'B3'],
+  min: 294.1,
+  max: 2222.9,
+};
+
+
+// una vegada sabem quines imatges volem baixar, anem pel dret a escollir cadascuna de les imatges
+// repeteixo el següent procés de descàrrega afegint manualment cadascuna de les imatges 
+// que he copiat a continuació:
+
+//"20210316T105031_20210316T105442_T31TBF",
+//"20210316T105031_20210316T105442_T31TCF",
+//"20210321T104639_20210321T105808_T31TBF",
+//"20210321T104639_20210321T105808_T31TCF",
+//"20210405T105021_20210405T105323_T31TBF",
+//"20210405T105021_20210405T105323_T31TCF",
+//"20210505T105031_20210505T105340_T31TCF",
+//"20210505T105031_20210505T105340_T31TBF",
+//"20210614T105031_20210614T105443_T31TCF",
+//"20210614T105031_20210614T105443_T31TBF",
+//"20210624T105031_20210624T105223_T31TCF",
+//"20210624T105031_20210624T105223_T31TBF",
+//"20210714T105031_20210714T105030_T31TCF",
+//"20210714T105031_20210714T105030_T31TBF",
+//"20210719T104619_20210719T105903_T31TCF",
+//"20210719T104619_20210719T105903_T31TBF",
+//"20210813T105031_20210813T105445_T31TCF",
+//"20210813T105031_20210813T105445_T31TBF",
+//"20210828T104619_20210828T105859_T31TCF",
+//"20210828T104619_20210828T105859_T31TBF",
+//"20211007T104829_20211007T105534_T31TCF",
+//"20211007T104829_20211007T105534_T31TBF"]; 
+
+
+///**he probat fer loops però no conserva el nom de la imatge a descarregar una vegada l'ha identificat a taks
+/// hi ha altres sitemes més complexes a partir de colleccions però en el cas concret del Delta
+/// com que havia de fer igualment una sel·lecció de les imatges, no servien
+ 
+var S2 = ee.Image('COPERNICUS/S2_SR/20211007T104829_20211007T105534_T31TBF')
+    .select('B8', 'B4', 'B3')
+    .clip(Delta);
+  
+Map.addLayer(S2, vizParams, 'Collection');
+  
+  
+//descarreguem la imatge (les bandes de 10m)
+Export.image.toDrive({
+    image: S2,
+    description: '20211007T104829_20211007T105534_T31TBF',
+    scale: 10,
+    region: Delta,
+    folder: "S2"
+});
+
